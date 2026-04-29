@@ -181,8 +181,8 @@ The simplest way to run AlexCMS is using Docker Compose.
 ## 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourname/alexcms.git
-cd alexcms
+git clone https://github.com/Pucur/AlexCMS.git
+cd AlexCMS
 ```
 
 ---
@@ -345,7 +345,7 @@ http://SERVER_IP
 or (if DOMAIN is configured):
 
 ```
-https://your-domain.com
+https://example.com
 ```
 
 ---
