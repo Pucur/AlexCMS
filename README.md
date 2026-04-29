@@ -129,13 +129,13 @@ AlexCMS/
 ├── logs/                     # Application logs (Winston rotation)
 │
 ├── web/                      # Main application source
-│
+│   │
 │   ├── routes/               # Backend routing layer (Express)
 │   │   ├── admin.js          # Admin panel (CMS core)
 │   │   ├── auth.js           # Authentication & login system
 │   │   ├── guestbook.js      # Guestbook functionality
 │   │   └── main.js           # Public-facing routes
-│
+│   │
 │   ├── views/                # EJS template engine views
 │   │   ├── admin.ejs
 │   │   ├── article.ejs
@@ -147,7 +147,7 @@ AlexCMS/
 │   │   ├── login.ejs
 │   │   ├── menu_edit.ejs
 │   │   └── privacy.ejs
-│
+│   │
 │   ├── public/               # Static frontend assets
 │   │   ├── js/               # Client-side scripts
 │   │   │  ├── admin.js
@@ -159,7 +159,7 @@ AlexCMS/
 │   │   ├── favicon.png
 │   │   ├── robots.txt
 │   │   └── style.css
-│
+│   │
 │   ├── db.js                 # PostgreSQL connection layer
 │   ├── logger.js             # Winston logging configuration
 │   └── server.js             # Application entry point
