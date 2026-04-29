@@ -1,0 +1,159 @@
+<%/*
+#############################################################
+#     ▄▄    ▄▄             ▄   ▄▄▄▄  ▄▄▄     ▄▄▄    ▄▄▄▄▄   #
+#   ▄█▀▀█▄   ██            ▀██████▀   ███▄ ▄███    ██▀▀▀▀█▄ #
+#   ██  ██   ██              ██       ██ ▀█▀ ██    ▀██▄  ▄▀ #
+#   ██▀▀██   ██ ▄█▀█▄▀██ ██▀ ██       ██     ██      ▀██▄▄  #
+# ▄ ██  ██   ██ ██▄█▀  ███   ██       ██     ██    ▄   ▀██▄ #
+# ▀██▀  ▀█▄█▄██▄▀█▄▄▄▄██ ██▄ ▀█████ ▀██▀     ▀██▄  ▀██████▀ #
+#############################################################
+*/%>
+<body>
+
+<div style="margin-bottom: 20px;">
+  <a href="/lang/hu">🇭🇺 Magyar</a> |
+  <a href="/lang/en">🇬🇧 English</a>
+</div>
+
+<%
+  const now = new Date();
+  const birth = new Date(1993, 0, 2);
+  const diffYears = (now - birth) / (1000 * 60 * 60 * 24 * 365.25);
+  const age = diffYears.toFixed(1);
+  const child1Birth = new Date(2024, 0, 1);
+  const child1Age = ((now - child1Birth) / (1000 * 60 * 60 * 24 * 365.25)).toFixed(1);
+  const child2Birth = new Date(2025, 3, 1);
+  const child2Age = ((now - child2Birth) / (1000 * 60 * 60 * 24 * 365.25)).toFixed(1);
+%>
+
+<h1>
+<center>  <%= lang === "en" ? "🔥 Welcome to my homepage 🔥" : "🔥 Üdv a főoldalon 🔥" %></center>
+</h1>
+
+<marquee behavior="alternate" scrollamount="6">
+  💾 Code • Hack • Build • Break • Fix • Repeat 💾
+</marquee>
+
+<hr>
+
+<p>
+<%= lang === "en"
+  ? "Hi! My name is Ládonyi Alex. Welcome to my personal homepage on the World Wide Web 🌐"
+  : "Szia! Ládonyi Alex vagyok. Üdv a személyes weboldalamon a világhálón 🌐"
+%>
+</p>
+
+<h2>
+  <%= lang === "en" ? "👾 About me" : "👾 Rólam" %>
+</h2>
+
+<p>
+<% if (lang === "en") { %>
+
+🔲 I live somewhere between a CPU fan spinning at 100% and a perfectly optimized Linux system 😄<br><br>
+
+🎮 I’m into computers, video games, biking, swimming, skateboarding and basically anything where motion + chaos = fun.<br><br>
+
+📚 I read crime and sci-fi books like they’re system manuals for another universe.<br><br>
+
+🌍 I travel to random places just to “explore the map in real life”.<br><br>
+
+💻 Old hardware? I don’t throw it away — I resurrect it.<br><br>
+
+🤖 PC building, tuning, scripting, automation… I love when things just RUN THEMSELVES like a well-written system.<br><br>
+
+🐧 Linux is home: Arch, Ubuntu, Debian — I speak them fluently.<br><br>
+
+🔧 Arduino, soldering, building weird useful stuff — if it has wires, I’ll probably break it… then fix it better.<br><br>
+
+🌐 I absolutely love creating and editing websites. My first website in 2004 was visited by over 67,000 people (a huge number back then 😄). Its daily peak hit 759 unique visitors. Web design and content creation has been a long-time hobby of mine ever since.<br><br>
+
+📡 In the early days of my “computer life”, I even ran a DC++ server from our home PC — reaching a record of 124 simultaneous users. It was only online while we were home (8 AM – 9 PM) over a slow ADSL connection. - In that moment, I truly realized that working with servers and systems would become one of the core parts of my life.
+
+<% } else { %>
+
+🔲 Az életem valahol egy 100%-on pörgő CPU ventilátor és egy tökéletesen optimalizált Linux rendszer között van 😄<br><br>
+
+🎮 Szeretem a számítógépeket, videójátékokat, a bringázást, úszást, gördeszkázást — mindent, ahol a mozgás + káosz = szórakozás.<br><br>
+
+📚 A krimi és sci-fi könyveket úgy olvasom, mintha más univerzumok kézikönyvei lennének.<br><br>
+
+🌍 Szeretek random helyekre utazni, mintha élesben explore-olnám a mapet.<br><br>
+
+💻 A régi hardvereket nem kidobom — feltámasztom.<br><br>
+
+🤖 PC építés, tuning, scriptek, automatizálás… imádom, ha a dolgok MAGUKTÓL futnak, mint egy jól megírt rendszer.<br><br>
+
+🐧 Linux az otthonom: Arch, Ubuntu, Debian — folyékonyan beszélem őket.<br><br>
+
+🔧 Arduino, forrasztás, furcsa hasznos dolgok építése — ha van benne vezeték, nagy eséllyel szétszedem… majd jobban összerakom.<br><br>
+
+🌐 Nagyon szeretek weboldalakat készíteni és szerkeszteni. Az első oldalam 2004-ben több mint 67 000 látogatót kapott (akkor ez hatalmas szám volt 😄). A napi csúcs 759 egyedi látogató volt. Azóta is hobbim a webdesign és tartalomkészítés.<br><br>
+
+📡 A gépes korszakom elején még DC++ szervert is üzemeltettem otthon, ami 124 egyidejű felhasználót ért el. Ez a suhanós ADSL interneten ment, és csak akkor volt elérhető, amikor otthon voltunk (reggel 8 és este 9 között) — Abban a pillanatban éreztem meg igazán, hogy a szerverekkel és rendszerekkel való foglalkozás lesz az életem egyik alapja.
+
+<% } %>
+</p>
+
+<hr>
+
+<h2>
+  <%= lang === "en" ? "🆙 Experience stats" : "🆙 Fejlődési adatok" %>
+</h2>
+
+<p>
+  <%= lang === "en"
+    ? "Alex's age: " + age
+    : "Alex életkora: " + age
+  %>
+</p>
+
+<p>
+<% if (lang === "en") { %>
+  Daughter age: <%= child1Age %> | Uses Windows XP on a
+  <a href="https://archive.shuttle.eu/2004/en/sb75g2.htm#sb75g2" target="_blank">Shuttle XPC</a>
+  🖥️ | Favorite game: My Little Pony 🐴✨
+<% } else { %>
+  Lányom életkora: <%= child1Age %> | Windows XP-t használ egy
+  <a href="https://archive.shuttle.eu/2004/en/sb75g2.htm#sb75g2" target="_blank">Shuttle XPC</a>
+  gépen 🖥️ | Kedvenc játéka: My Little Pony 🐴✨
+<% } %>
+</p>
+
+<p>
+<% if (lang === "en") { %>
+  Son age: <%= child2Age %> | Preparing for the new world 🌍✨
+<% } else { %>
+  Fiam életkora: <%= child2Age %> | Hamarosan készen áll az új világra 🌍✨
+<% } %>
+</p>
+
+<hr>
+
+<h2>
+  <%= lang === "en" ? "❤️ Favorites" : "❤️ Kedvencek" %>
+</h2>
+
+<ul>
+  <% if (lang === "en") { %>
+    <li>🍝 Milanese pasta</li>
+    <li>🍕 Pizza (main fuel)</li>
+    <li>📺 Twin Peaks</li>
+    <li>🖥️ Old computers & hardware</li>
+  <% } else { %>
+    <li>🍝 Milánói makaróni</li>
+    <li>🍕 Pizza (fő üzemanyag)</li>
+    <li>📺 Twin Peaks</li>
+    <li>🖥️ Régi számítógépek és hardverek</li>
+  <% } %>
+</ul>
+<hr>
+
+<p style="font-style: italic;">
+  <%= lang === "en"
+    ? "My children are my everything. They are the meaning of my life."
+    : "A gyerekeim az életem értelmei. Ők jelentenek nekem mindent."
+  %>
+</p>
+
+</body>

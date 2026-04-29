@@ -1,0 +1,103 @@
+<%/*
+#############################################################
+#     ▄▄    ▄▄             ▄   ▄▄▄▄  ▄▄▄     ▄▄▄    ▄▄▄▄▄   #
+#   ▄█▀▀█▄   ██            ▀██████▀   ███▄ ▄███    ██▀▀▀▀█▄ #
+#   ██  ██   ██              ██       ██ ▀█▀ ██    ▀██▄  ▄▀ #
+#   ██▀▀██   ██ ▄█▀█▄▀██ ██▀ ██       ██     ██      ▀██▄▄  #
+# ▄ ██  ██   ██ ██▄█▀  ███   ██       ██     ██    ▄   ▀██▄ #
+# ▀██▀  ▀█▄█▄██▄▀█▄▄▄▄██ ██▄ ▀█████ ▀██▀     ▀██▄  ▀██████▀ #
+#############################################################
+*/%>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/public/favicon.png" type="image/png">
+  <link rel="shortcut icon" href="/public/favicon.png">
+  <title><%= typeof site_title !== 'undefined' ? site_title : 'AlexCMS' %></title>
+  <meta name="description" content="<%= meta_description !== 'undefined' ? meta_description : '' %>">
+  <meta name="keywords" content="<%= meta_keywords !== 'undefined' ? meta_keywords : '' %>">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+
+<div class="sidebar">
+
+  <% const m = (typeof menu !== 'undefined' && Array.isArray(menu)) ? menu : []; %>
+
+  <% m.forEach(item => { %>
+    <a href="<%= item.url.startsWith('/') ? item.url : '/' + item.url %>">
+      <%= item.name %>
+    </a>
+  <% }) %>
+
+  <div class="sidebar-footer glitch" data-text="<%= lastUpdate %>">
+
+<div class="stats">
+
+  <div name="daily" class="stat-box">
+    <% if (lang === "en") { %>
+      Daily:<br>
+    <% } else { %>
+      Napi:<br>
+    <% } %>
+    <input name="daily" readonly value="<%= stats.today %>">
+  </div>
+
+  <div name="average" class="stat-box">
+    <% if (lang === "en") { %>
+      Average:<br>
+    <% } else { %>
+      Átlag:<br>
+    <% } %>
+    <input name="average" readonly value="<%= stats.avg %>">
+  </div>
+
+  <div name="total" class="stat-box">
+    <% if (lang === "en") { %>
+      Total:<br>
+    <% } else { %>
+      Összes:<br>
+    <% } %>
+    <input name="total" readonly value="<%= stats.total %>">
+  </div>
+
+</div>
+
+  <% if (lang === "en") { %>
+      Last update:<br>
+  <% } else { %>
+    Utolsó frissítés:<br>
+  <% } %>
+
+    <%= lastUpdate %><br>
+
+  <% if (lang === "en") { %>
+    Online since:<br>
+  <% } else { %>
+    Indulás dátuma:<br>
+  <% } %>
+
+  <%= firstStart %><br>
+
+<a href="/privacy"><%= lang === "en" ? "Privacy Policy" : "Adatkezelési tájékoztató" %></a>
+
+  </div>
+
+<div class="admin-link">
+  <a href="/admin">
+    <%= lang === "en" ? "Admin page" : "Admin oldal" %>
+  </a>
+</div>
+
+</div>
+
+</div>
+
+<div class="content">
+  <%- body %>
+</div>
+
+</body>
+</html>

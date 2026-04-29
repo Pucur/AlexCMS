@@ -1,0 +1,21 @@
+{
+  "name": "AlexCMS",
+  "version": "1.0.0",
+  "main": "app/server.js",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^5.0.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.1.1",
+    "@vitalets/google-translate-api": "^9.2.0",
+    "bcrypt": "^6.0.0",
+    "svg-captcha": "^1.4.0",
+    "pg": "^8.20.0",
+    "quill": "^2.0.3",
+    "sanitize-html": "^2.17.3",
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston": "^3.19.0",
+    "http-proxy-agent": "^9.0.0"
+  }
+}

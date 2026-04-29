@@ -1,0 +1,14 @@
+.env
+.session
+*.tfvars
+*.pem
+*.key
+.terraform/
+.oci/
+.*~
+.terraform.lock.hcl
+screenshot.avif
+sql/
+logs/
+data/
+Caddyfile

@@ -1,0 +1,273 @@
+<%/*
+#############################################################
+#     ▄▄    ▄▄             ▄   ▄▄▄▄  ▄▄▄     ▄▄▄    ▄▄▄▄▄   #
+#   ▄█▀▀█▄   ██            ▀██████▀   ███▄ ▄███    ██▀▀▀▀█▄ #
+#   ██  ██   ██              ██       ██ ▀█▀ ██    ▀██▄  ▄▀ #
+#   ██▀▀██   ██ ▄█▀█▄▀██ ██▀ ██       ██     ██      ▀██▄▄  #
+# ▄ ██  ██   ██ ██▄█▀  ███   ██       ██     ██    ▄   ▀██▄ #
+# ▀██▀  ▀█▄█▄██▄▀█▄▄▄▄██ ██▄ ▀█████ ▀██▀     ▀██▄  ▀██████▀ #
+#############################################################
+*/%>
+<a href="/admin">« <%= lang === 'en' ? 'Back' : 'Vissza' %></a>
+
+<h2><%= lang === 'en' ? 'Menu Editing' : 'Menü szerkesztése' %></h2>
+
+<hr>
+
+<form method="POST" action="/admin/menu/edit/<%= menu.id %>">
+  <input name="name" value="<%= menu.name_hu %>"><br>
+  <input name="url" value="<%= menu.url %>"><br>
+
+  <select name="type">
+    <option value="article" <%= menu.type==='article'?'selected':'' %>><%= lang === 'en' ? 'Article' : 'Cikk' %></option>
+    <option value="download" <%= menu.type==='download'?'selected':'' %>><%= lang === 'en' ? 'Download' : 'Letöltés' %></option>
+    <option value="gallery" <%= menu.type==='gallery'?'selected':'' %>><%= lang === 'en' ? 'Gallery' : 'Galéria' %></option>
+  </select>
+
+  <button type="submit"><%= lang === 'en' ? 'Save' : 'Mentés' %></button>
+</form>
+
+<hr>
+
+<% if (editArticle) { %>
+
+<h3><%= lang === 'en' ? 'Edit Article' : 'Cikk szerkesztése' %></h3>
+
+<form method="POST" action="/admin/articles/<%= editArticle.id %>" class="js-editor-form">
+  <input type="hidden" name="menu_id" value="<%= editArticle.menu_id %>">
+
+  <input name="title" value="<%= editArticle.title_hu %>"><br>
+
+  <div class="quill-wrap">
+    <div class="editor"
+         data-target="content"
+         data-content="<%= editArticle.content_hu %>"></div>
+    <div id="char-counter" class="char-counter">0 karakter</div>
+  </div>
+
+  <input type="hidden" name="content">
+
+  <button type="submit"><%= lang === 'en' ? 'Save' : 'Mentés' %></button>
+</form>
+
+<hr>
+<% } %>
+
+<% if (editDownload) { %>
+
+<h3><%= lang === 'en' ? 'Edit Download' : 'Letöltés szerkesztése' %></h3>
+
+<form method="POST" action="/admin/downloads/<%= editDownload.id %>" class="js-editor-form">
+  <input type="hidden" name="menu_id" value="<%= editDownload.menu_id %>">
+
+  <input name="name" value="<%= editDownload.name_hu %>"><br>
+
+  <div class="quill-wrap">
+    <div class="editor"
+         data-target="description"
+         data-content="<%= editDownload.description_hu %>"></div>
+    <div id="char-counter" class="char-counter">0 karakter</div>
+  </div>
+
+  <input type="hidden" name="description">
+
+  <button type="submit"><%= lang === 'en' ? 'Save' : 'Mentés' %></button>
+</form>
+
+<hr>
+<% } %>
+
+<% if (editGallery) { %>
+
+<h3><%= lang === 'en' ? 'Edit Image Title' : 'Új képcím' %></h3>
+
+<form method="POST" action="/admin/gallery/<%= editGallery.id %>" class="js-editor-form">
+  <input type="hidden" name="menu_id" value="<%= editGallery.menu_id %>">
+
+  <input name="title" value="<%= editGallery.title_hu %>"><br>
+
+  <button type="submit"><%= lang === 'en' ? 'Save' : 'Mentés' %></button>
+</form>
+
+<hr>
+<% } %>
+
+<% if (menu.type==='article') { %>
+
+<% if (!editArticle) { %>
+
+<h3><%= lang === 'en' ? 'New Article' : 'Új cikk' %></h3>
+
+<form method="POST" action="/admin/articles" class="js-editor-form">
+  <input type="hidden" name="menu_id" value="<%= menu.id %>">
+
+  <input name="title"><br>
+
+  <div class="quill-wrap">
+    <div class="editor" data-target="content"></div>
+    <div id="char-counter" class="char-counter">0 karakter</div>
+  </div>
+
+  <input type="hidden" name="content">
+
+  <button type="submit"><%= lang === 'en' ? 'Create' : 'Létrehoz' %></button>
+</form>
+
+<hr>
+<% } %>
+
+<h3><%= lang === 'en' ? 'Articles' : 'Cikkek' %></h3>
+
+<% articles.forEach(a => { %>
+  <div>
+    <b><%= a.title_hu %></b>
+
+    <a href="/admin/articles/load/<%= a.id %>"><%= lang === 'en' ? 'Edit' : 'Szerkesztés' %></a>
+
+    <form method="POST"
+          action="/admin/articles/delete/<%= a.id %>"
+          class="js-confirm-delete"
+          data-message="<%= lang === 'en'
+            ? 'Are you sure you want to delete this article?'
+            : 'Biztos törlöd ezt a cikket?' %>">
+          <button type="submit">
+              <%= lang === 'en' ? 'Delete' : 'Törlés' %>
+          </button>
+    </form>
+  </div>
+<% }) %>
+
+<% } %>
+
+<% if (menu.type === 'download') { %>
+
+<% if (!editDownload) { %>
+
+<h3><%= lang === 'en' ? 'New Download' : 'Új letöltés' %></h3>
+
+<form method="POST"
+      action="/admin/downloads"
+      enctype="multipart/form-data"
+      class="js-editor-form">
+
+  <input type="hidden" name="menu_id" value="<%= menu.id %>">
+
+  <input name="name" placeholder="Név"><br>
+
+  <div class="quill-wrap">
+    <div class="editor" data-target="description"></div>
+    <div id="char-counter" class="char-counter">0 karakter</div>
+  </div>
+
+  <input type="hidden" name="description">
+
+  <input type="file" name="file"><br>
+
+  <button type="submit"><%= lang === 'en' ? 'Add' : 'Hozzáadás' %></button>
+</form>
+
+<hr>
+<% } %>
+
+<% downloads.forEach(d => { %>
+  <div>
+    <b><%= d.name_hu %></b>
+
+    <a href="/admin/downloads/load/<%= d.id %>"><%= lang === 'en' ? 'Edit' : 'Szerkesztés' %></a>
+
+    <form method="POST"
+          action="/admin/downloads/delete/<%= d.id %>"
+          class="js-confirm-delete"
+          data-message="<%= lang === 'en'
+            ? 'Are you sure you want to delete this file?'
+            : 'Biztos törlöd ezt a fájlt?' %>">
+          <button type="submit">
+              <%= lang === 'en' ? 'Delete' : 'Törlés' %>
+          </button> 
+    </form>
+  </div>
+<% }) %>
+
+<% } %>
+<% if (menu.type==='gallery') { %>
+
+<% if (!editGallery) { %>
+
+<h3><%= lang === 'en' ? 'Images' : 'Képek' %></h3>
+
+<form method="POST" action="/admin/gallery" enctype="multipart/form-data">
+  <input type="hidden" name="menu_id" value="<%= menu.id %>">
+
+  <input name="title" placeholder="<%= lang === 'en' ? 'Image title' : 'Kép címe' %>"><br>
+
+  <div class="dropzone" id="dz-image">
+    <div class="dz-text">
+      <%= lang === 'en' ? '🖼 Drag here or click' : '🖼 Húzd ide vagy kattints' %>
+    </div>
+    <input type="file" name="image" hidden accept="image/*">
+  </div>
+
+</form>
+
+<% } %>
+
+<hr>
+
+<% gallery.forEach(g => { %>
+  <div>
+    <img src="<%= g.image_path %>" width="120"><br>
+    <%= g.title_hu %>
+
+    <a href="/admin/gallery/load/<%= g.id %>"><%= lang === 'en' ? 'Edit' : 'Szerkesztés' %></a>
+
+    <form method="POST"
+          action="/admin/gallery/delete/<%= g.id %>"
+          class="js-confirm-delete"
+          data-message="<%= lang === 'en'
+            ? 'Are you sure you want to delete this image?'
+            : 'Biztos törlöd ezt a képet?' %>"> 
+          <button type="submit">
+              <%= lang === 'en' ? 'Delete' : 'Törlés' %>
+          </button>
+    </form>
+  </div>
+<% }) %>
+
+<% } %>
+
+<script src="/static/quill/dist/quill.js" defer></script>
+<link href="/static/quill/dist/quill.snow.css" rel="stylesheet">
+
+<style>
+.char-counter {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #666;
+  background: #f8f9fa;
+  border-top: 1px solid #ddd;
+  text-align: right;
+}
+.quill-wrap {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+.ql-editor {
+  min-height: 180px;
+  max-height: 320px;
+  color: #000000;
+}
+.dropzone {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+.dropzone.hover {
+  background: #f8f9ff;
+}
+</style>
+
+<script src="/public/js/menu_edit.js" defer></script>

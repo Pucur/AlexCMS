@@ -1,0 +1,240 @@
+<%/*
+#############################################################
+#     ▄▄    ▄▄             ▄   ▄▄▄▄  ▄▄▄     ▄▄▄    ▄▄▄▄▄   #
+#   ▄█▀▀█▄   ██            ▀██████▀   ███▄ ▄███    ██▀▀▀▀█▄ #
+#   ██  ██   ██              ██       ██ ▀█▀ ██    ▀██▄  ▄▀ #
+#   ██▀▀██   ██ ▄█▀█▄▀██ ██▀ ██       ██     ██      ▀██▄▄  #
+# ▄ ██  ██   ██ ██▄█▀  ███   ██       ██     ██    ▄   ▀██▄ #
+# ▀██▀  ▀█▄█▄██▄▀█▄▄▄▄██ ██▄ ▀█████ ▀██▀     ▀██▄  ▀██████▀ #
+#############################################################
+*/%>
+<h1><%= pageMenu.name %></h1>
+
+<div class="gallery">
+  <% gallery.forEach((img, index) => { %>
+    <div class="img" data-index="<%= index %>">
+      <img
+        src="<%= img.image_path %>"
+        class="gallery-img"
+        data-full="<%= img.image_path %>"
+        alt="<%= lang === 'en' ? (img.title_en || img.title_hu) : img.title_hu %>"
+        loading="lazy"
+      />
+      <p><%= lang === 'en' ? (img.title_en || img.title_hu) : img.title_hu %></p>
+
+        <% if (user && user.username) { %>
+    <a href="/admin/gallery/load/<%= img.id %>"><%= lang === 'en' ? 'Edit' : 'Szerkesztés' %></a>
+
+    <form method="POST"
+          action="/admin/gallery/delete/<%= img.id %>"
+          class="js-confirm-delete"
+          data-message="<%= lang === 'en'
+            ? 'Are you sure you want to delete this image?'
+            : 'Biztos törlöd ezt a képet?' %>">
+          <button type="submit">
+              <%= lang === 'en' ? 'Delete' : 'Törlés' %>
+          </button>
+    </form>
+
+      <% } %>
+
+    </div>
+  <% }) %>
+</div>
+
+<div id="lightbox" class="lightbox-hidden">
+  <div class="lightbox-container">
+    <button id="lightbox-close" class="lightbox-btn" aria-label="Close">×</button>
+    
+    <button id="prev" class="lightbox-btn prev-btn" aria-label="Previous">‹</button>
+    <button id="next" class="lightbox-btn next-btn" aria-label="Next">›</button>
+    
+    <div class="lightbox-image-container">
+      <img id="lightbox-img" class="lightbox-img" alt="Full size image">
+      <div class="zoom-controls">
+        <button id="zoom-in" class="zoom-btn">+</button>
+        <button id="zoom-out" class="zoom-btn">−</button>
+        <button id="zoom-reset" class="zoom-btn">↻</button>
+      </div>
+    </div>
+    
+    <div class="lightbox-info">
+      <span id="lightbox-index">1 / 1</span>
+      <span id="lightbox-title"></span>
+    </div>
+  </div>
+</div>
+
+<style>
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.gallery-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.lightbox-hidden {
+  display: none !important;
+}
+
+.lightbox-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.lightbox-btn {
+  position: absolute;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.1);
+}
+
+#lightbox-close {
+  top: 20px;
+  right: 20px;
+}
+
+.prev-btn {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.next-btn {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-image-container {
+  position: relative;
+  width: 90%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.lightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  touch-action: none;
+  cursor: grab;
+}
+
+.lightbox-img:active {
+  cursor: grabbing;
+}
+
+.zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.zoom-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zoom-btn:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.lightbox-info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+  font-size: 1.1rem;
+  background: rgba(0,0,0,0.5);
+  padding: 10px 20px;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+}
+@media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .lightbox-container {
+    padding: 10px;
+  }
+  
+  .lightbox-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+  }
+  
+  .zoom-controls {
+    bottom: 10px;
+    right: 10px;
+  }
+  
+  .lightbox-info {
+    bottom: 10px;
+    left: 10px;
+    font-size: 1rem;
+    padding: 8px 15px;
+  }
+}
+</style>
+<script src="/public/js/gallery.js" defer></script>
+<% if (user && user.username) { %>
+  <script src="/public/js/delete.js" defer></script>
+<% } %>

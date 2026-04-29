@@ -1,0 +1,104 @@
+<%/*
+#############################################################
+#     ▄▄    ▄▄             ▄   ▄▄▄▄  ▄▄▄     ▄▄▄    ▄▄▄▄▄   #
+#   ▄█▀▀█▄   ██            ▀██████▀   ███▄ ▄███    ██▀▀▀▀█▄ #
+#   ██  ██   ██              ██       ██ ▀█▀ ██    ▀██▄  ▄▀ #
+#   ██▀▀██   ██ ▄█▀█▄▀██ ██▀ ██       ██     ██      ▀██▄▄  #
+# ▄ ██  ██   ██ ██▄█▀  ███   ██       ██     ██    ▄   ▀██▄ #
+# ▀██▀  ▀█▄█▄██▄▀█▄▄▄▄██ ██▄ ▀█████ ▀██▀     ▀██▄  ▀██████▀ #
+#############################################################
+*/%>
+<body>
+<h1><%= lang === "en" ? "Privacy Policy" : "Adatkezelési tájékoztató" %></h1>
+
+<p>
+<%= lang === "en"
+  ? "This website is a personal homepage operated by " + settings.admin_user + ". It is not a commercial service."
+  : "Ez az oldal " + settings.admin_user + " személyes weboldala, nem kereskedelmi szolgáltatás."
+%>
+</p>
+
+<hr>
+
+<h2><%= lang === "en" ? "1. Data we collect" : "1. Gyűjtött adatok" %></h2>
+
+<ul>
+<% if (lang === "en") { %>
+  <li>IP address (for security and abuse prevention)</li>
+  <li>Session data (for login and admin functionality)</li>
+  <li>Basic request logs (page visits, timestamps)</li>
+  <li>Admin actions (e.g. content editing, deletion)</li>
+<% } else { %>
+  <li>IP cím (biztonsági és visszaélés-megelőzési célból)</li>
+  <li>Session adatok (bejelentkezés és admin működéshez)</li>
+  <li>Alap látogatási naplók (oldalmegtekintés, időpont)</li>
+  <li>Admin műveletek (pl. szerkesztés, törlés)</li>
+<% } %>
+</ul>
+
+<hr>
+
+<h2><%= lang === "en" ? "2. Purpose of data processing" : "2. Adatkezelés célja" %></h2>
+
+<ul>
+<% if (lang === "en") { %>
+  <li>Website security</li>
+  <li>Prevention of abuse and attacks</li>
+  <li>Proper functioning of admin features</li>
+  <li>Basic usage statistics</li>
+<% } else { %>
+  <li>Weboldal biztonsága</li>
+  <li>Visszaélések és támadások megelőzése</li>
+  <li>Admin funkciók működtetése</li>
+  <li>Alap statisztikák készítése</li>
+<% } %>
+</ul>
+
+<hr>
+
+<h2><%= lang === "en" ? "3. Data storage" : "3. Adatok tárolása" %></h2>
+
+<p>
+<%= lang === "en"
+  ? "Logs are stored for a limited period of time (typically 7–30 days) and are automatically deleted or rotated."
+  : "A naplók korlátozott ideig (általában 7–30 napig) kerülnek tárolásra, majd automatikusan törlésre vagy forgatásra kerülnek."
+%>
+</p>
+
+<hr>
+
+<h2><%= lang === "en" ? "4. Data sharing" : "4. Adatok megosztása" %></h2>
+
+<p>
+<%= lang === "en"
+  ? "We do not sell, share, or distribute personal data to third parties."
+  : "Személyes adatokat harmadik félnek nem adunk el, nem osztunk meg."
+%>
+</p>
+
+<hr>
+
+<h2><%= lang === "en" ? "5. Cookies & sessions" : "5. Sütik és sessionök" %></h2>
+
+<p>
+<%= lang === "en"
+  ? "The website uses session cookies to manage login state and language preferences."
+  : "Az oldal session sütiket használ a bejelentkezés és a nyelvi beállítások kezelésére."
+%>
+</p>
+
+<hr>
+
+<h2><%= lang === "en" ? "6. Contact" : "6. Kapcsolat" %></h2>
+
+<p>
+<%= lang === "en"
+  ? "If you have any questions regarding data handling, you can contact the site owner."
+  : "Adatkezeléssel kapcsolatos kérdés esetén a weboldal üzemeltetője elérhető."
+%>
+</p>
+
+<p>
+<b><%= settings.admin_user %></b>
+</p>
+</body>

@@ -1,0 +1,41 @@
+<%/*
+#############################################################
+#     ▄▄    ▄▄             ▄   ▄▄▄▄  ▄▄▄     ▄▄▄    ▄▄▄▄▄   #
+#   ▄█▀▀█▄   ██            ▀██████▀   ███▄ ▄███    ██▀▀▀▀█▄ #
+#   ██  ██   ██              ██       ██ ▀█▀ ██    ▀██▄  ▄▀ #
+#   ██▀▀██   ██ ▄█▀█▄▀██ ██▀ ██       ██     ██      ▀██▄▄  #
+# ▄ ██  ██   ██ ██▄█▀  ███   ██       ██     ██    ▄   ▀██▄ #
+# ▀██▀  ▀█▄█▄██▄▀█▄▄▄▄██ ██▄ ▀█████ ▀██▀     ▀██▄  ▀██████▀ #
+#############################################################
+*/%>
+<h1><%= pageMenu.name %></h1>
+<% files.forEach(f => { %>
+  <div>
+    <a href="/download/<%= f.id %>"><%= f.name %></a><br>
+    <%- lang === 'en' ? f.description_en : f.description_hu %>
+    <%= lang === 'en' ? 'Size' : 'Méret' %>: <%= f.size %><br>
+    <%= lang === 'en' ? 'Downloads' : 'Letöltések' %>: <%= f.downloads %>
+
+    <% if (f.link) { %>
+      <a href="<%= f.link %>" target="_blank"><%= lang === 'en' ? '🔗 Link' : '🔗 Link' %></a>
+    <% } %>
+
+    <% if (user && user.username) { %>
+      <a href="/admin/downloads/load/<%= f.id %>"><%= lang === 'en' ? 'Edit' : 'Szerkesztés' %></a>
+
+      <form method="POST"
+            action="/admin/downloads/delete/<%= f.id %>" style="display:inline;"
+            class="js-confirm-delete"
+            data-message="<%= lang === 'en'
+              ? 'Are you sure you want to delete this file?'
+              : 'Biztos törlöd ezt a fájlt?' %>">
+        <button type="submit">
+            <%= lang === 'en' ? 'Delete' : 'Törlés' %>
+        </button>
+      </form>
+    <% } %>
+  </div>
+<% }) %>
+<% if (user && user.username) { %>
+  <script src="/public/js/delete.js" defer></script>
+<% } %>

@@ -1,0 +1,307 @@
+name: Deploy AlexCMS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -------------------------
+      # OCI CONFIG
+      # -------------------------
+      - name: Create OCI config
+        if: ${{ vars.INSTALLED != 'true' }}
+        run: |
+          set -e
+          mkdir -p ~/.oci
+
+          echo "[DEFAULT]" > ~/.oci/config
+          echo "user=${USER}" >> ~/.oci/config
+          echo "fingerprint=${FINGERPRINT}" >> ~/.oci/config
+          echo "tenancy=${TENANCY}" >> ~/.oci/config
+          echo "region=${REGION}" >> ~/.oci/config
+          echo "key_file=/home/runner/.oci/oci_key.pem" >> ~/.oci/config
+
+          echo "${KEY_FILE}" > ~/.oci/oci_key.pem
+          chmod 600 ~/.oci/oci_key.pem ~/.oci/config
+
+          echo "✅ Config ready:"
+          cat ~/.oci/config
+        env:
+          USER: ${{ secrets.USER }}
+          FINGERPRINT: ${{ secrets.FINGERPRINT }}
+          TENANCY: ${{ secrets.TENANCY }}
+          REGION: ${{ vars.REGION }}
+          KEY_FILE: ${{ secrets.KEY_FILE }}
+
+      # -------------------------
+      #  TERRAFORM SETUP
+      # -------------------------
+      - name: Setup Terraform
+        if: ${{ vars.INSTALLED != 'true' }}
+        uses: hashicorp/setup-terraform@v3
+
+      # -------------------------
+      #  TERRAFORM INIT & PLAN
+      # -------------------------
+      - name: Terraform Init
+        if: ${{ vars.INSTALLED != 'true' }}
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        if: ${{ vars.INSTALLED != 'true' }}
+        working-directory: terraform
+        run: terraform plan
+        env:
+          TF_VAR_instance_name: ${{ vars.INSTANCE_NAME }}
+          TF_VAR_region: ${{ vars.REGION }}
+          TF_VAR_public_ssh_key: ${{ vars.PUBLIC_SSH }}
+          TF_VAR_compartment_id: ${{ secrets.COMPARTMENT }}
+          TF_VAR_subnet_id: ${{ secrets.SUBNET }}
+          TF_VAR_source_id: ${{ vars.SOURCE }}
+
+      # -------------------------
+      #  TERRAFORM APPLY
+      # -------------------------
+      - name: Terraform Apply
+        if: ${{ vars.INSTALLED != 'true' }}
+        working-directory: terraform
+        run: terraform apply -auto-approve
+        continue-on-error: true
+        env:
+          TF_VAR_instance_name: ${{ vars.INSTANCE_NAME }}
+          TF_VAR_region: ${{ vars.REGION }}
+          TF_VAR_public_ssh_key: ${{ vars.PUBLIC_SSH }}
+          TF_VAR_compartment_id: ${{ secrets.COMPARTMENT }}
+          TF_VAR_subnet_id: ${{ secrets.SUBNET }}
+          TF_VAR_source_id: ${{ vars.SOURCE }}
+
+      # -------------------------
+      # GET SERVER IP
+      # -------------------------
+      - name: Get Server IP + Update Variable
+        if: ${{ vars.INSTALLED != 'true' }}
+        id: ip
+        working-directory: terraform
+        run: |
+          IP=$(terraform show -json | jq -r '.values.root_module.resources[]? | select(.type=="oci_core_instance") | .values."public_ip"' | head -1)
+          echo "server_ip=$IP" >> $GITHUB_OUTPUT
+          echo "SERVER_IP=$IP" >> $GITHUB_ENV
+
+
+          if [ -n "$IP" ]; then
+            curl -X PATCH \
+              -H "Authorization: Bearer $REPO_VARIABLES_PAT" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/variables/SERVER_IP" \
+              -d "{\"name\":\"SERVER_IP\",\"value\":\"$IP\"}"
+            echo "✅ SERVER_IP updated to $IP"
+          fi
+        env:
+          REPO_VARIABLES_PAT: ${{ secrets.REPO_VARIABLES_PAT }}
+      # -------------------------
+      # WAIT FOR SSH
+      # -------------------------
+      - name: Wait for SSH
+        if: ${{ vars.INSTALLED != 'true' }}
+        timeout-minutes: 5
+        run: |
+          set -e
+
+          echo ""
+          echo "======================================"
+          echo "🚀 SSH WAIT START"
+          echo "======================================"
+          echo ""
+
+          SERVER_IP="${{ steps.ip.outputs.server_ip }}"
+          if [ -z "$SERVER_IP" ]; then
+            SERVER_IP="${{ vars.SERVER_IP }}"
+          fi
+
+          echo "⏳ Waiting for $SERVER_IP..."
+          echo ""
+
+          mkdir -p ~/.ssh
+
+          echo "🔑 Loading SSH key..."
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          echo "⏳ Waiting for port 22..."
+          timeout 300 bash -c "
+            until nc -z $SERVER_IP 22; do
+              echo '   ↳ SSH port not ready yet...'
+              sleep 5
+            done
+          "
+
+          echo "📡 Adding host to known_hosts (after port is ready)..."
+          ssh-keyscan -H "$SERVER_IP" >> ~/.ssh/known_hosts 2>/dev/null
+
+          echo "🔐 Testing SSH login..."
+          timeout 120 bash -c "
+            until ssh -i ~/.ssh/id_rsa \
+              -o BatchMode=yes \
+              -o ConnectTimeout=5 \
+              ubuntu@$SERVER_IP 'whoami' >/dev/null 2>&1; do
+              echo '   ↳ SSH not ready yet...'
+              sleep 5
+            done
+          "
+
+          echo ""
+          echo "======================================"
+          echo "✅ SSH READY: ubuntu@$SERVER_IP"
+          echo "======================================"
+          echo ""
+
+        env:
+          REPO_VARIABLES_PAT: ${{ secrets.REPO_VARIABLES_PAT }}
+      # -------------------------
+      # DEPLOY
+      # -------------------------
+      - name: Deploy via server bootstrap
+        env:
+          INSTALLED: ${{ vars.INSTALLED }}
+          SERVER_IP: ${{ vars.SERVER_IP }}
+          CREDENTIAL: ${{ secrets.CREDENTIAL }}
+          ADMIN_USER: ${{ secrets.ADMIN_USER }}
+          REPO_VARIABLES_PAT: ${{ secrets.REPO_VARIABLES_PAT }}
+          DOMAIN: ${{ secrets.DOMAIN }}
+        run: |
+          if [ "$INSTALLED" = "true" ]; then
+            echo "🔑 Loading SSH key..."
+            mkdir -p ~/.ssh
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H "$SERVER_IP" >> ~/.ssh/known_hosts 2>/dev/null
+          else
+            SERVER_IP="${{ steps.ip.outputs.server_ip }}"
+          fi
+
+          if [ -z "$SERVER_IP" ]; then
+            echo "❌ SERVER_IP is empty in GitHub variables"
+            exit 1
+          fi
+          echo "🔑 Logging to SSH..."
+          ssh -i ~/.ssh/id_rsa ubuntu@$SERVER_IP bash -s <<EOF
+          set -e
+
+          INSTALLED="${{ vars.INSTALLED }}"
+          CREDENTIAL="${{ secrets.CREDENTIAL }}"
+          ADMIN_USER="${{ secrets.ADMIN_USER }}"
+          REPO_VARIABLES_PAT="${{ secrets.REPO_VARIABLES_PAT }}"
+          DOMAIN="${{ secrets.DOMAIN }}"
+
+          if [ "$INSTALLED" != "true" ]; then
+            echo "🧹 Cleaning default MOTD clutter..."
+
+            sudo rm -f /etc/update-motd.d/00-header
+            sudo rm -f /etc/update-motd.d/10-help-text
+            sudo rm -f /etc/update-motd.d/50-landscape-sysinfo
+            sudo rm -f /etc/update-motd.d/50-motd-news
+
+            echo "⚙️ Installing fastfetch..."
+
+            wget https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb
+            sudo dpkg -i fastfetch-linux-amd64.deb
+            echo "📄 Creating fastfetch MOTD..."
+            echo '#!/bin/bash
+            export TERM=xterm-256color
+            export COLORTERM=truecolor
+            fastfetch' | sudo tee /etc/update-motd.d/00-fastfetch > /dev/null
+            sudo chmod +x /etc/update-motd.d/00-fastfetch
+            rm fastfetch-linux-amd64.deb
+            sudo timedatectl set-timezone Europe/Berlin # Set it to your timezone
+            sudo apt update
+            sudo apt upgrade -y
+            sudo apt dist-upgrade -y
+
+
+            # --- GIT ---
+            echo "📦 Installing other useful parts..."
+            sudo apt install -y mc screen
+            echo "🔧 Checking dependencies..."
+            echo "📦 Installing git..."
+            sudo apt install -y git
+
+            # --- DOCKER ---
+            echo "🐳 Installing Docker CE (official repo)..."
+
+            sudo apt install -y ca-certificates curl
+
+            sudo install -m 0755 -d /etc/apt/keyrings
+
+            sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+              -o /etc/apt/keyrings/docker.asc
+
+            sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+            echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+            sudo apt update
+
+            sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+            sudo usermod -aG docker ubuntu || true
+
+            sudo systemctl enable docker
+            sudo systemctl start docker
+
+            echo "📥 Cloning repo..."
+              echo $CREDENTIAL
+              git clone https://x-access-token:${CREDENTIAL}@github.com/${GITHUB_REPOSITORY_OWNER}/AlexCMS.git /home/ubuntu/AlexCMS
+           echo "🔐 Generating secure session password..."
+            printf "SESSION_SECRET=%s" \
+            "$(openssl rand -hex 32)" > .session
+           echo "🔐 Generating secure DB password..."
+            printf "ADMIN_USER=%s\nADMIN_PASSWORD=%s\nDB_PASSWORD=%s\n" \
+            "$ADMIN_USER" \
+            "$(openssl rand -hex 32)" \
+            "$(openssl rand -hex 32)" > .env
+              DOMAIN="${{ secrets.DOMAIN }}"
+              printf '%s\n' \
+                "$DOMAIN {" \
+                "   reverse_proxy app:80" \
+                "}" \
+                > Caddyfile
+
+            curl -L -X PATCH \
+              -H "Authorization: Bearer $REPO_VARIABLES_PAT" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/variables/INSTALLED \
+              -d '{"name":"INSTALLED","value":"true"}'
+            echo "📌 Marked INSTALLED=true"
+          fi
+
+            cd /home/ubuntu/AlexCMS
+
+            echo "🔄 Syncing latest code..."
+            git fetch origin main
+            git reset --hard origin/main
+            echo "🐳 Restarting containers..."
+            sg docker -c "
+              cd /home/ubuntu/AlexCMS
+              docker compose down || true
+              docker compose up -d --build
+              docker image prune -f
+            "
+
+            echo "✅ DEPLOY DONE"
+            echo "🚀 YOUR SITE IS LIVE AT:"
+            echo "  http://$SERVER_IP"
+          if [ "$INSTALLED" = "true" ] && [ -f .env ]; then
+              echo "‼️  Please delete the .env file if you stored passwords in it. ‼️"
+            fi
+
+          EOF
