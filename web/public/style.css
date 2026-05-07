@@ -253,25 +253,6 @@ h2, h3 {
   margin-top: 30px;
 }
 
-code {
-  background: rgba(0, 255, 65, 0.1);
-  border: 1px solid #00ff41;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-family: 'Courier New', monospace;
-  color: #00ff41;
-  box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.2);
-}
-
-pre {
-  background: #0a0a0a;
-  border: 1px solid #333;
-  padding: 15px;
-  border-radius: 5px;
-  overflow-x: auto;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-}
-
 button, input[type="submit"] {
   background: linear-gradient(145deg, #001100, #003300);
   border: 2px solid #00ff41;
@@ -342,4 +323,86 @@ button:hover, input[type="submit"]:hover {
   .content {
     margin-left: 0;
   }
+}
+
+.ql-code-block-container {
+  display: block;
+}
+
+.ql-code-block {
+  display: block;
+  white-space: pre;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 2px 6px;
+  background: #0d1117;
+  border-left: 1px solid #30363d;
+  border-right: 1px solid #30363d;
+}
+
+.ql-code-block + .ql-code-block {
+  margin-top: 0;
+}
+
+p code {
+  display: inline;
+}
+
+/* egymás melletti / egymás alatti code blokkok "összeolvasztása" */
+p:has(code) {
+  margin: 0;
+}
+
+p + p:has(code) {
+  margin-top: 0;
+}
+
+/* a code blokkok közti törések eltüntetése */
+p:has(code) + p:has(code) {
+  margin-top: -5px;
+}
+
+/* code blokk egységesítés */
+code {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 0; /* fontos: ne darabolja vizuálisan */
+  padding: 2px 6px;
+  display: inline;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  color: #c9d1d9;
+  white-space: pre;
+}
+
+/* ha pre-ben van, akkor egy blokk legyen */
+pre code {
+  display: block;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+pre {
+  margin: 0;
+  border-radius: 0;
+  border-bottom: none;
+}
+
+/* első */
+pre:first-of-type {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+/* utolsó */
+pre:last-of-type {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  border-bottom: 1px solid #333;
+}
+
+/* köztes */
+pre + pre {
+  margin-top: 0px; /* eltünteti a rést */
 }

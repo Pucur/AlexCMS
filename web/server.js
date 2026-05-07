@@ -248,5 +248,4 @@ app.use("/", require("./routes/main"));
 /* ======================
    START
 ====================== */
-console.log(process.env.SESSION_SECRET);
 app.listen(80, () => console.log("http://localhost:80"));

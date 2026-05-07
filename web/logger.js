@@ -12,7 +12,7 @@ const winston = require("winston");
 require("winston-daily-rotate-file");
 const path = require("path");
 
-const logDir = path.join(__dirname, "/app/logs");
+const logDir = path.join(process.cwd(), "logs");
 
 const transport = new winston.transports.DailyRotateFile({
   dirname: logDir,

@@ -1,5 +1,13 @@
 const editors = [];
 
+const Inline = Quill.import('blots/inline');
+
+class Code extends Inline {}
+Code.blotName = 'code';
+Code.tagName = 'code';
+
+Quill.register(Code);
+
 /* ======================
   NOTIFICATION SYSTEM
 ====================== */
@@ -26,31 +34,31 @@ function notify(zone, msg, type = "info") {
 /* ======================
   QUILL COUNTER MODULE
 ====================== */
-Quill.register('modules/counter', function(quill, options) {
-  const container = typeof options.container === 'string' 
+const CounterModule = function (quill, options) {
+  const container = typeof options.container === 'string'
     ? document.querySelector(options.container)
     : options.container;
-  
+
   if (!container) return;
-  
+
   function update() {
     const text = quill.getText().trim();
     const length = text.length;
     container.innerHTML = `${length} ${length === 1 ? 'karakter' : 'karakterek'}`;
   }
-  
+
   quill.on('text-change', update);
   update();
-});
+};
+
+Quill.register('modules/counter', CounterModule);
 
 /* ======================
   INIT
 ====================== */
 function initEditors() {
   editors.forEach(e => {
-    try {
-      e.quill.disable();
-    } catch (_) {}
+    try { e.quill.disable(); } catch (_) {}
   });
   editors.length = 0;
 
@@ -58,7 +66,7 @@ function initEditors() {
     if (el.dataset.inited === "1") return;
 
     const counterContainer = el.closest('.quill-wrap')?.querySelector('.char-counter');
-    
+
     const quill = new Quill(el, {
       theme: 'snow',
       modules: {
@@ -80,10 +88,11 @@ function initEditors() {
     el.dataset.inited = "1";
 
     if (el.dataset.content) {
-      quill.root.innerHTML = el.dataset.content;
+      quill.clipboard.dangerouslyPasteHTML(el.dataset.content, 'silent');
     }
 
     const toolbar = quill.getModule('toolbar');
+
     toolbar.addHandler('image', () => {
       const input = document.createElement('input');
       input.type = 'file';
@@ -97,12 +106,8 @@ function initEditors() {
         formData.append('upload', file);
 
         try {
-          const res = await fetch('/admin/upload', {
-            method: 'POST',
-            body: formData
-          });
-
-          if (!res.ok) throw new Error("upload failed");
+          const res = await fetch('/admin/upload', { method: 'POST', body: formData });
+          if (!res.ok) throw new Error();
 
           const data = await res.json();
 
@@ -122,6 +127,41 @@ function initEditors() {
 }
 
 /* ======================
+  HTML ESCAPE
+====================== */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/* ======================
+  CODE NORMALIZER (QL -> PRE CODE)
+====================== */
+function quillCodeToPre(html) {
+  html = html.replace(/<p><br><\/p>/g, '');
+
+  html = html.replace(
+    /<div class="ql-code-block-container">([\s\S]*?)<\/div>/g,
+    (_, container) => {
+      const code = container
+        .match(/<div class="ql-code-block[^>]*>([\s\S]*?)<\/div>/g)
+        ?.map(line =>
+          line
+            .replace(/<div class="ql-code-block[^>]*>/, "")
+            .replace(/<\/div>/, "")
+        )
+        .join("\n") || "";
+
+      return `<pre><code>${escapeHtml(code)}</code></pre>`;
+    }
+  );
+
+  return html;
+}
+
+/* ======================
   SYNC EDITORS
 ====================== */
 function syncEditors() {
@@ -131,10 +171,14 @@ function syncEditors() {
 
     const name = e.el.dataset.target;
     const input = form.querySelector(`input[name="${name}"]`);
+    if (!input) return;
 
-    if (input) {
-      input.value = e.quill.root.innerHTML;
-    }
+    let html = e.quill.root.innerHTML;
+
+    html = html.replace(/<p><br><\/p>/g, '');
+    html = quillCodeToPre(html);
+
+    input.value = html;
   });
 }
 
@@ -181,6 +225,7 @@ function setupDropzone(zoneId) {
 
   zone.addEventListener('dragover', () => zone.classList.add('hover'));
   zone.addEventListener('dragleave', () => zone.classList.remove('hover'));
+
   zone.addEventListener('drop', async (e) => {
     zone.classList.remove('hover');
     const files = e.dataTransfer?.files;

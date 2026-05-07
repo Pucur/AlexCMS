@@ -300,8 +300,5 @@ jobs:
             echo "✅ DEPLOY DONE"
             echo "🚀 YOUR SITE IS LIVE AT:"
             echo "  http://$SERVER_IP"
-          if [ "$INSTALLED" = "true" ] && [ -f .env ]; then
-              echo "‼️  Please delete the .env file if you stored passwords in it. ‼️"
-            fi
 
           EOF
