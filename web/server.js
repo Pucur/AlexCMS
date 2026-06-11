@@ -240,6 +240,10 @@ app.get("/robots.txt", (req, res) => {
   res.type("text/plain");
   res.sendFile(path.join(__dirname, "public/robots.txt"));
 });
+app.get("/sitemap.xml", (req, res) => {
+  res.type("application/xml");
+  res.sendFile(path.join(__dirname, "public/sitemap.xml"));
+});
 app.use("/auth", require("./routes/auth"));
 app.use("/admin", require("./routes/admin"));
 app.use("/guestbook", require("./routes/guestbook"));

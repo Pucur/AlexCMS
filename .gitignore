@@ -12,3 +12,4 @@ sql/
 logs/
 data/
 Caddyfile
+web/public/sitemap.xml
