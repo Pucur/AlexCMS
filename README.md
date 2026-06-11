@@ -3,7 +3,7 @@
 A lightweight, multilingual, self-hosted CMS built with **Node.js**, **Express**, and **PostgreSQL**.
 Designed for simplicity, speed, and easy deployment with Docker.
 
-![Screenshot](https://i.kek.sh/6PGOUB0GwFG.png)
+![Screenshot](https://i.kek.sh/KEZ78voZcDU.jpg)
 
 AlexCMS provides a clean admin interface for managing:
 
