@@ -50,7 +50,6 @@ body::after {
 
   padding-right: 12px;
 
-  /* kurzor középre igazítva */
   background:
     linear-gradient(#00aa00, #00aa00) right center / 10px 0.8em no-repeat;
 
@@ -137,7 +136,7 @@ body::after {
 }
 
 .sidebar-footer {
-  margin-top: auto; /* EZ TOLJA LE ALULRA */
+  margin-top: auto;
   text-align: center;
   font-size: 12px;
   opacity: 0.7;
@@ -145,6 +144,17 @@ body::after {
   border-top: 1px solid #00ff41;
   padding-top: 15px;
 }
+
+.sidebar-footer-social {
+  display: flex;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.7;
+  font-weight: bold;
+  border-top: 1px solid #00ff41;
+  padding-top: 15px;
+}
+
 
 .sidebar h2 {
   color: #ffff00;
@@ -305,7 +315,6 @@ button:hover, input[type="submit"]:hover {
 @keyframes glitch-anim {
   0% { clip: rect(43px, 9999px, 49px, 0); }
   5% { clip: rect(41px, 9999px, 51px, 0); }
-  /* ... more keyframes for glitch effect */
 }
 
 @keyframes glitch-anim2 {
@@ -349,7 +358,6 @@ p code {
   display: inline;
 }
 
-/* egymás melletti / egymás alatti code blokkok "összeolvasztása" */
 p:has(code) {
   margin: 0;
 }
@@ -358,16 +366,14 @@ p + p:has(code) {
   margin-top: 0;
 }
 
-/* a code blokkok közti törések eltüntetése */
 p:has(code) + p:has(code) {
   margin-top: -5px;
 }
 
-/* code blokk egységesítés */
 code {
   background: #0d1117;
   border: 1px solid #30363d;
-  border-radius: 0; /* fontos: ne darabolja vizuálisan */
+  border-radius: 0;
   padding: 2px 6px;
   display: inline;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -376,7 +382,6 @@ code {
   white-space: pre;
 }
 
-/* ha pre-ben van, akkor egy blokk legyen */
 pre code {
   display: block;
   padding: 12px;
@@ -389,20 +394,17 @@ pre {
   border-bottom: none;
 }
 
-/* első */
 pre:first-of-type {
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
 
-/* utolsó */
 pre:last-of-type {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   border-bottom: 1px solid #333;
 }
 
-/* köztes */
 pre + pre {
-  margin-top: 0px; /* eltünteti a rést */
+  margin-top: 0px;
 }

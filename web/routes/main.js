@@ -94,7 +94,8 @@ router.get("/:slug", async (req, res) => {
             },
             lang,
             user: req.session.user,
-            settings
+            settings,
+            pageTitle: menuName
         });
     }
     /* =========================
@@ -126,7 +127,8 @@ router.get("/:slug", async (req, res) => {
           ...menu,
           name: menuName
         },
-        lang
+        lang,
+        PageTitle
       });
     }
     /* =========================
@@ -144,7 +146,8 @@ router.get("/:slug", async (req, res) => {
           ...menu,
           name: menuName
         },
-        lang
+        lang,
+        pageTitle
       });
     }
 

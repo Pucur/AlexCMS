@@ -14,7 +14,7 @@
   <meta charset="UTF-8">
   <link rel="icon" href="/public/favicon.png" type="image/png">
   <link rel="shortcut icon" href="/public/favicon.png">
-  <title><%= typeof site_title !== 'undefined' ? site_title : 'AlexCMS' %></title>
+  <title><%= (typeof pageTitle !== 'undefined' && pageTitle) ? pageTitle + ' | ' + (site_title || 'AlexCMS') : (site_title || 'AlexCMS') %></title>
   <meta name="description" content="<%= meta_description !== 'undefined' ? meta_description : '' %>">
   <meta name="keywords" content="<%= meta_keywords !== 'undefined' ? meta_keywords : '' %>">
   <meta name="robots" content="index, follow">
@@ -32,8 +32,8 @@
     </a>
   <% }) %>
 
-  <div class="sidebar-footer glitch" data-text="<%= lastUpdate %>">
 
+  <div class="sidebar-footer glitch">
 <div class="stats">
 
   <div name="daily" class="stat-box">
@@ -84,6 +84,18 @@
 <a href="/privacy"><%= lang === "en" ? "Privacy Policy" : "Adatkezelési tájékoztató" %></a>
 
   </div>
+
+
+  <div class="sidebar-footer-social">
+<a href="https://www.linkedin.com/in/alex-ládonyi" target="_blank" rel="noopener noreferrer">
+  <img src="/public/linkedin.svg" alt="LinkedIn" width="32" height="32">
+</a>
+
+<a href="https://github.com/Pucur/" target="_blank" rel="noopener noreferrer">
+  <img src="/public/github.svg" alt="GitHub" width="32" height="32">
+</a>
+</div>
+
 
 <div class="admin-link">
   <a href="/admin">

@@ -34,11 +34,19 @@ const errorTransport = new winston.transports.DailyRotateFile({
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
-    winston.format.timestamp(),
+    winston.format.timestamp({
+      format: () => {
+        return new Date().toLocaleString("sv-SE", {
+          timeZone: "Europe/Budapest"
+        }).replace(" ", " T ");
+      }
+    }),
+
     winston.format.printf(({ timestamp, level, ip, message, method, url, role }) => {
       return `${timestamp} [${level}] - ${ip} ${method} ${url} (${role}) ${message}`;
     })
   ),
+
   transports: [
     transport,
     errorTransport,

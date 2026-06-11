@@ -12,7 +12,7 @@
 <% articles.forEach(a => { %>
   <div style="margin-bottom:20px;">
     
-    <h2><%= lang === 'en' ? a.title_en : a.title_hu %></h2>
+    <h1><%= lang === 'en' ? a.title_en : a.title_hu %></h1>
 
     <p><%- lang === 'en' ? a.content_en : a.content_hu %></p>
   
