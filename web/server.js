@@ -27,6 +27,186 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+/* ======================
+   ANTI BOT
+====================== */
+
+const badPatterns = [
+
+  /* =========================
+     CORE DANGER (.env / git)
+  ========================= */
+  /\.env/i,
+  /\.git/i,
+  /\.git\/config/i,
+  /\.env\./i,
+
+  /* =========================
+     PHP / WEB SHELL SCANS
+  ========================= */
+  /\.php/i,
+  /shell/i,
+  /cmd/i,
+  /command/i,
+  /backdoor/i,
+  /upload/i,
+  /uploads/i,
+  /wso/i,
+  /r57/i,
+  /c99/i,
+  /eval/i,
+  /assert/i,
+
+  /* =========================
+     WORDPRESS EXPLOIT SCANS
+  ========================= */
+  /wp-content/i,
+  /wp-admin/i,
+  /wp-includes/i,
+  /wp-login/i,
+  /wp-json/i,
+  /wp-config/i,
+  /xmlrpc/i,
+  /wordpress/i,
+  /wp-/i,
+
+  /* =========================
+     COMMON CMS / FRAMEWORK TARGETS
+  ========================= */
+  /joomla/i,
+  /drupal/i,
+  /magento/i,
+  /laravel/i,
+  /symfony/i,
+  /thinkphp/i,
+  /codeigniter/i,
+
+  /* =========================
+     DEBUG / DEV LEAK TARGETS
+  ========================= */
+  /debug/i,
+  /dev/i,
+  /test/i,
+  /staging/i,
+  /stage/i,
+  /local/i,
+  /env/i,
+  /info\.php/i,
+  /phpinfo/i,
+  /telescope/i,
+  /horizon/i,
+  /actuator/i,
+  /profiler/i,
+
+  /* =========================
+     CONFIG / SECRET SEARCH
+  ========================= */
+  /config/i,
+  /configuration/i,
+  /settings/i,
+  /credentials/i,
+  /secret/i,
+  /secrets/i,
+  /token/i,
+  /keys/i,
+  /key/i,
+  /database/i,
+  /db/i,
+
+  /* =========================
+     BACKUP / FILE LEAK SCANS
+  ========================= */
+  /\.bak/i,
+  /\.old/i,
+  /\.backup/i,
+  /\.save/i,
+  /\.swp/i,
+  /\.tmp/i,
+  /\.zip/i,
+  /\.tar/i,
+  /\.gz/i,
+  /\.sql/i,
+  /\.7z/i,
+  /\.rar/i,
+
+  /* =========================
+     ADMIN / LOGIN TARGETS
+  ========================= */
+  /admin/i,
+  /login/i,
+  /signin/i,
+  /auth/i,
+  /dashboard/i,
+  /cpanel/i,
+  /panel/i,
+
+  /* =========================
+     SERVER / INFRA SCANS
+  ========================= */
+  /server-status/i,
+  /status/i,
+  /metrics/i,
+  /health/i,
+  /monitor/i,
+
+  /* =========================
+     EXPLOIT / ATTACK WORDS
+  ========================= */
+  /exploit/i,
+  /payload/i,
+  /hack/i,
+  /inject/i,
+  /injection/i,
+  /scan/i,
+  /scanner/i,
+  /probe/i,
+
+  /* =========================
+     RANDOM BOT MASS SCANS
+  ========================= */
+  /this_is_a_test/i,
+  /hello_world/i,
+  /random/i,
+  /test123/i,
+  /asdf/i,
+
+];
+
+app.use((req, res, next) => {
+  const url = req.originalUrl;
+
+  if (badPatterns.some(r => r.test(url))) {
+    return res.status(404).end();
+  }
+
+  next();
+});
+
+const ipScore = new Map();
+
+app.use((req, res, next) => {
+  const ip =
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.socket.remoteAddress;
+
+  const url = req.originalUrl;
+
+  let score = ipScore.get(ip) || 0;
+
+  if (/\.env|\.git|wp-|\.php|filemanager/i.test(url)) {
+    score += 5;
+  }
+
+  if (score > 10) {
+    return res.status(404).end();
+  }
+
+  ipScore.set(ip, score);
+
+  next();
+});
+
 /* ======================
    MIDDLEWARE
 ====================== */
