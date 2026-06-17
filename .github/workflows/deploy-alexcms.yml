@@ -216,7 +216,7 @@ jobs:
             echo '#!/bin/bash
             export TERM=xterm-256color
             export COLORTERM=truecolor
-            fastfetch' | sudo tee /etc/update-motd.d/00-fastfetch > /dev/null
+            /usr/bin/fastfetch --pipe false' | sudo tee /etc/update-motd.d/00-fastfetch > /dev/null
             sudo chmod +x /etc/update-motd.d/00-fastfetch
             rm fastfetch-linux-amd64.deb
             sudo timedatectl set-timezone Europe/Berlin # Set it to your timezone
