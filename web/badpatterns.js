@@ -70,7 +70,6 @@ const badPatterns = [
   ========================= */
   /config/i,
   /configuration/i,
-  /settings/i,
   /credentials/i,
   /secret/i,
   /secrets/i,
