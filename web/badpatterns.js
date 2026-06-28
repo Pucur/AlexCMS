@@ -99,7 +99,6 @@ const badPatterns = [
   /* =========================
      ADMIN / LOGIN TARGETS
   ========================= */
-  /login/i,
   /signin/i,
   /dashboard/i,
   /cpanel/i,
